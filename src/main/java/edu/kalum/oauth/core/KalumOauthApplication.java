@@ -18,7 +18,6 @@ public class KalumOauthApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		System.out.println(passwordEncoder.encode("Guatemala"));
-		System.out.println(passwordEncoder.encode("sabado"));
+		
 	}
 }

@@ -98,7 +98,7 @@ public class UsuarioController {
             String username = tokenStore.readAuthentication(token).getUserAuthentication().getName();
             logger.debug("Obteniendo información del usuario por medio del username");
             Usuario usuario = usuarioService.findByUsername(username);
-            return new ResponseEntity<Usuario>(usuario,HttpStatus.OK);
+            return new ResponseEntity<Usuario>(usuario,HttpStatus.I_AM_A_TEAPOT);
         }catch (CannotCreateTransactionException e) {
             logger.error("Error al momento de conectarse a la base de datos");
             response.put("Mensaje","Error al momento de conectarse a la base de datos");
@@ -129,6 +129,17 @@ public class UsuarioController {
             return new ResponseEntity<Map<String,Object>>(response,HttpStatus.BAD_REQUEST);
         }
         try{
+            if(this.usuarioService.findByEmail(value.getEmail()) != null ){
+                logger.error("Error el correo electronico ya existe");
+                response.put("Mensaje","Correo electronico existente");
+                response.put("Error","Correo electronico existente");
+                return new ResponseEntity<Map<String,Object>>(response, HttpStatus.BAD_REQUEST);
+            }else if(this.usuarioService.findByUsername(value.getUsername()) != null ){
+                logger.error("Error el username ya existe");
+                response.put("Mensaje","Username existente");
+                response.put("Error","Username existente");
+                return new ResponseEntity<Map<String,Object>>(response, HttpStatus.BAD_REQUEST);
+            }
             List<Role> roles = new ArrayList<Role>();
             Role role = this.roleService.findById(2L);
             roles.add(role);
@@ -145,7 +156,7 @@ public class UsuarioController {
             logger.error("Error al realizar el insert a la base de datos");
             response.put("Mensaje","Error al realizar el insert a la base de datos");
             response.put("Error",e.getMessage().concat(": ".concat(e.getMostSpecificCause().getMessage())));
-            return new ResponseEntity<Map<String,Object>>(response, HttpStatus.SERVICE_UNAVAILABLE);
+            return new ResponseEntity<Map<String,Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         logger.debug("Finalizando preceso de insert del usuario a la base de datos");
         response.put("Mensaje","El usuario ha sido creado con éxito");
@@ -168,13 +179,10 @@ public class UsuarioController {
         try {
             update = usuarioService.findById(id);
             if (update != null) {
-                update.setEnabled(value.isEnabled());
-                update.setPassword(passwordEncoder.encode(value.getPassword()));
                 update.setUsername(value.getUsername());
                 update.setApellidos(value.getApellidos());
                 update.setNombres(value.getNombres());
                 update.setBio(value.getBio());
-                update.setEmail(value.getEmail());
                 usuarioService.save(update);
             } else {
                 logger.debug("No existe el usuario con el id ".concat(id.toString()));
@@ -321,6 +329,7 @@ public class UsuarioController {
                 Role role = roleService.findById(idRole);
                 if(role != null){
                     usuario.getRoles().remove(role);
+                    usuarioService.save(usuario);
                 }else{
                     logger.warn("No existe el role con el id ".concat(idRole.toString()));
                     response.put("Mensaje","No existe el role con el id ".concat(idRole.toString()));

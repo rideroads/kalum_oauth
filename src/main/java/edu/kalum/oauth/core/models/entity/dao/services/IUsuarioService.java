@@ -10,4 +10,5 @@ public interface IUsuarioService {
     public Usuario findById(Long id);
     public List<Usuario> findAll();
     public void deleteById(Long id);
+    public Usuario findByEmail(String email);
 }

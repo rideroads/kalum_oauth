@@ -61,4 +61,8 @@ public class UsuarioService implements UserDetailsService, IUsuarioService {
     public List<Usuario> findAll(){
         return this.usuarioDao.findAll();
     }
+    @Override
+    public Usuario findByEmail(String email){
+        return this.usuarioDao.findByEmail(email);
+    }
 }
