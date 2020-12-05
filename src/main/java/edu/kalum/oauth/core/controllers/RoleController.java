@@ -171,6 +171,7 @@ public class RoleController{
             logger.error("Error al momento de ejecuatar la consulta a la base de datos");
             response.put("Mensaje","Error al momento de ejecutar la consulta a la base de datos");
             response.put("Error",e.getMessage().concat(" :").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String,Object>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
         }
         response.put("Mensaje","El registro fue eliminado con éxito");
         return new ResponseEntity<Map<String,Object>>(response,HttpStatus.OK);
